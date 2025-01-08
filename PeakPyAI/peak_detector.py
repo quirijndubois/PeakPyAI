@@ -7,7 +7,9 @@ import matplotlib.pyplot as plt
 
 class PeakDetector:
     max_estimators = 100
-    step = 10
+    step = 1
+    test_size = 0.1
+    random_state = 42
 
     def create_features_and_labels(self):
 
@@ -38,10 +40,10 @@ class PeakDetector:
         X, y = self.create_features_and_labels()
         
         # Split the data into training and testing sets
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=self.test_size, random_state=self.random_state)
         
         # Initialize the model (Random Forest) with warm_start=True for incremental training
-        model = RandomForestClassifier(n_estimators=10, warm_start=True, random_state=42)
+        model = RandomForestClassifier(n_estimators=self.step, warm_start=True, random_state=self.random_state)
         
         max_estimators = self.max_estimators  # Total number of trees
         step = self.step        # Number of trees to add in each iteration
@@ -64,28 +66,23 @@ class PeakDetector:
             training_accuracies.append(train_acc)
             testing_accuracies.append(test_acc)
             
-            print(f'Number of Trees: {n_estimators}, Training Accuracy: {train_acc:.4f}, Testing Accuracy: {test_acc:.4f}')
+            print(f'Iteration: {n_estimators}, Training Accuracy: {train_acc:.4f}, Testing Accuracy: {test_acc:.4f}')
+        
+        self.training_progress = training_accuracies
+        self.testing_progress = testing_accuracies
+        self.model = model
 
-        # Plot training and testing accuracies over number of trees
+    def plot_progress(self):
+        # Plot training progress
         plt.figure(figsize=(10, 6))
-        plt.plot(estimator_range, training_accuracies, label='Training Accuracy')
-        plt.plot(estimator_range, testing_accuracies, label='Testing Accuracy')
-        plt.xlabel('Number of Trees')
+        plt.plot(self.training_progress, label='Training Accuracy')
+        plt.plot(self.testing_progress, label='Testing Accuracy')
+        plt.xlabel('Iteration')
         plt.ylabel('Accuracy')
         plt.title('Training Progress Over Time')
         plt.legend()
         plt.grid(True)
         plt.show()
-        
-        # Final model with max_estimators
-        model.n_estimators = max_estimators
-        model.fit(X_train, y_train)  # Ensure the model is fully trained
-        
-        # Test the final model
-        y_pred = model.predict(X_test)
-        print(f'Final Accuracy with {max_estimators} trees: {accuracy_score(y_test, y_pred):.4f}')
-        
-        self.model = model
 
     def predict_peak_probabilities(self, signal):
         # Generate features for prediction
@@ -95,8 +92,10 @@ class PeakDetector:
             next_val = signal[i + 1] if i < len(signal) - 1 else 0
             features.append([signal[i], prev_val, next_val])
         
-        # Predict probabilities for each index in the signal
-        self.peak_probabilities = self.model.predict_proba(features)[:, 1]  # We want the probability of being a peak (class 1)
+        # Predict probability of being a peak for each index in the signal
+        self.peak_probabilities = self.model.predict_proba(features)[:, 1]
 
     def calculate_peaks_by_probability_threshold(self,threshold=0.5):
+        # We use a threshold to determine if a peak is detected
+        # There should be a better way of determining individual peaks
         self.detected_peaks = np.where(self.peak_probabilities > threshold)[0]
