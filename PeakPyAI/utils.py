@@ -34,17 +34,23 @@ def plot_data(signal=None,actual_peaks=None,detected_peaks=None, probabilities=N
 
     plt.show()
 
-def generate_random_data(peaks_range=[20,20],y_range=[0.1,1],resolution=200,std_range=[0.1,2],noise=0.02):
+def generate_random_data(
+        resolution=200,
+        peaks_range=[20,20],
+        peak_height_range=[0.1,1],
+        std_range=[0.1,2],
+        noise_strength=0.02):
+    
     n_peaks = int(mapRange(np.random.random(),0,1,peaks_range[0],peaks_range[1]))
 
     signal = np.zeros(resolution)
     peaks = []
     for _ in range(n_peaks):
-        y_peak = mapRange(np.random.random(),0,1,y_range[0],y_range[1])
+        y_peak = mapRange(np.random.random(),0,1,peak_height_range[0],peak_height_range[1])
         x_peak = mapRange(np.random.random(),0,1,0,resolution)
         std = mapRange(np.random.random(),0,1,std_range[0],std_range[1])
         peaks.append(round(x_peak))
         signal += normal_distribution(np.arange(resolution),x_peak,std) * y_peak
-    signal += np.random.randn(resolution)*noise
+    signal += (np.random.randn(resolution)*2 - 1)*noise_strength
 
     return [signal,peaks]
