@@ -4,12 +4,17 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 import matplotlib.pyplot as plt
+from scipy.signal import find_peaks
+import pickle
+
 
 class PeakDetector:
-    max_estimators = 100
-    step = 1
-    test_size = 0.1
-    random_state = 42
+
+    def __init__(self,max_estimators=100,step=1,test_size=0.1,random_state=42):
+        self.max_estimators = max_estimators
+        self.step = step
+        self.test_size = test_size
+        self.random_state = random_state
 
     def create_features_and_labels(self):
 
@@ -35,7 +40,7 @@ class PeakDetector:
     def load_training_data(self,data_set):
         self.training_data = data_set
 
-    def train_peak_detection_model(self):
+    def train_model(self):
         # Prepare features and labels
         X, y = self.create_features_and_labels()
         
@@ -67,10 +72,20 @@ class PeakDetector:
             testing_accuracies.append(test_acc)
             
             print(f'Iteration: {n_estimators}, Training Accuracy: {train_acc:.4f}, Testing Accuracy: {test_acc:.4f}')
-        
+
+
         self.training_progress = training_accuracies
         self.testing_progress = testing_accuracies
         self.model = model
+
+    def save_model(self, filename):
+        # Save the trained model to a file
+        pickle.dump(self.model, open(filename, 'wb'))
+
+    def load_model(self, filename):
+        # Load the trained model from a file
+        import pickle
+        self.model = pickle.load(open(filename, 'rb'))
 
     def plot_progress(self):
         # Plot training progress
@@ -99,3 +114,6 @@ class PeakDetector:
         # We use a threshold to determine if a peak is detected
         # There should be a better way of determining individual peaks
         self.detected_peaks = np.where(self.peak_probabilities > threshold)[0]
+
+    def calculate_peaks_by_probability_peaks(self, trheshold=0.08):
+        self.detected_peaks = find_peaks(self.peak_probabilities, threshold=trheshold)[0]
