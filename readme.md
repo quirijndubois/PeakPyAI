@@ -10,6 +10,10 @@ Import the libary
 from PeakPyAI import PeakDetector, generate_random_data, plot_data
 ```
 
+The module has two type of peak detectors. The first one is a general peak detecord called PeakDetector. the second is made for smaller intervals that contain three peaks, this one is made with the intention of adding peakheight detection of overlapping gaussian peaks as well. That ons is called GaussianPeakDecector
+
+### 1. PeakDetector
+
 Either train a model, or load an existing one
 
 ```python
@@ -46,4 +50,31 @@ plot_data(
     detected_peaks=detector.detected_peaks,
     probabilities=detector.peak_probabilities
 )
+```
+
+### 2. GaussianPeakDetector
+
+From usage_gaussian_peak_detector.py
+
+```python
+from PeakPyAI.gaussian_detector import *
+
+dataset_size = 50
+epoch_amount = 200
+learning_rate = 0.0001
+
+# Training
+dataset = GaussianPeakDataset(dataset_size)
+model = GaussianPeakDetector()
+pipeline = GaussianTrainingPipeline(model, dataset, lr=learning_rate)
+
+pipeline.train(epochs=epoch_amount)
+pipeline.plot_losses()
+pipeline.save_model('PeakPyAI/trained_gaussian_model.pt')
+
+# Testing
+test_signal, test_peaks, test_heights = GaussianDataGenerator.generate_random_data()
+predicted_peaks = GaussianTesting.test_model(model, test_signal)
+
+GaussianTesting.visualize_results(test_signal, test_peaks, predicted_peaks)
 ```

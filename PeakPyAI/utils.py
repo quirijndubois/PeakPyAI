@@ -37,17 +37,21 @@ def plot_data(signal=None,actual_peaks=None,detected_peaks=None, probabilities=N
 def generate_random_data(
         resolution=200,
         peaks_range=[20,20],
+        peak_position_range=[0,None],
         peak_height_range=[0.1,1],
         std_range=[0.1,2],
         noise_strength=0.02):
     
     n_peaks = int(mapRange(np.random.random(),0,1,peaks_range[0],peaks_range[1]))
 
+    if peak_position_range[1] is None:
+        peak_position_range[1] = resolution
+
     signal = np.zeros(resolution)
     peaks = []
     for _ in range(n_peaks):
         y_peak = mapRange(np.random.random(),0,1,peak_height_range[0],peak_height_range[1])
-        x_peak = mapRange(np.random.random(),0,1,0,resolution)
+        x_peak = mapRange(np.random.random(),0,1,peak_position_range[0],peak_position_range[1])
         std = mapRange(np.random.random(),0,1,std_range[0],std_range[1])
         peaks.append(round(x_peak))
         signal += normal_distribution(np.arange(resolution),x_peak,std) * y_peak
