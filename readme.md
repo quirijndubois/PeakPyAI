@@ -10,7 +10,7 @@ Import the libary
 from PeakPyAI import PeakDetector, generate_random_data, plot_data
 ```
 
-The module has two type of peak detectors. The first one is a general peak detecord called PeakDetector. the second is made for smaller intervals that contain three peaks, this one is made with the intention of adding peakheight detection of overlapping gaussian peaks as well. That ons is called GaussianPeakDecector
+The module has two types of peak detectors. The first one is a general peak detector called PeakDetector. The second, GuassianPeakDetector, is made for smaller intervals that contain three peaks, this one is made with the intention of adding peakheight detection of overlapping gaussian peaks in the future as well.
 
 ### 1. PeakDetector
 
