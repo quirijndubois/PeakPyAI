@@ -4,15 +4,15 @@ A simple project to do some peak detection in scientific data. Very quick implem
 
 ## Usage
 
+The module has two types of peak detectors. The first one is a general peak detector called PeakDetector. The second, GuassianPeakDetector, is made for smaller intervals that contain three peaks, this one is made with the intention of adding peakheight detection of overlapping gaussian peaks in the future as well.
+
+### 1. PeakDetector
+
 Import the libary
 
 ```python
 from PeakPyAI import PeakDetector, generate_random_data, plot_data
 ```
-
-The module has two types of peak detectors. The first one is a general peak detector called PeakDetector. The second, GuassianPeakDetector, is made for smaller intervals that contain three peaks, this one is made with the intention of adding peakheight detection of overlapping gaussian peaks in the future as well.
-
-### 1. PeakDetector
 
 Either train a model, or load an existing one
 
